@@ -1,3 +1,4 @@
+using Hypesoft.Application;
 using Hypesoft.Infrastructure.Configurations;
 using Serilog;
 
@@ -16,7 +17,22 @@ builder.Host.UseSerilog();
 // Add services to the container
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new() { 
+        Title = "Hypesoft Product Management API", 
+        Version = "v1",
+        Description = "API for managing products, categories, and inventory in the Hypesoft system"
+    });
+    
+    // Include XML comments
+    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    if (File.Exists(xmlPath))
+    {
+        c.IncludeXmlComments(xmlPath);
+    }
+});
 
 // Add Application services
 builder.Services.AddApplication();

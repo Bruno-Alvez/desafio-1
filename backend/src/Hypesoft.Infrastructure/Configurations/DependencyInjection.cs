@@ -1,4 +1,5 @@
 using Hypesoft.Application.Interfaces;
+using Hypesoft.Domain.Repositories;
 using Hypesoft.Infrastructure.Data;
 using Hypesoft.Infrastructure.Repositories;
 using Hypesoft.Infrastructure.Services;
@@ -23,14 +24,12 @@ public static class DependencyInjection
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<IProductService, ProductService>();
         
-        // Add AutoMapper
-        services.AddAutoMapper(typeof(DependencyInjection));
+        // AutoMapper is configured in Application layer
         
         // Add MediatR
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Hypesoft.Application.DependencyInjection).Assembly));
         
-        // Add FluentValidation
-        services.AddValidatorsFromAssembly(typeof(Hypesoft.Application.DependencyInjection).Assembly);
+        // FluentValidation is configured in Application layer
         
         return services;
     }
