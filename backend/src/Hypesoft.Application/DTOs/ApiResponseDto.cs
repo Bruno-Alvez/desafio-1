@@ -40,7 +40,7 @@ public class ApiResponseDto : ApiResponseDto<object>
         };
     }
 
-    public static ApiResponseDto ErrorResult(string message, List<string>? errors = null)
+    public static new ApiResponseDto ErrorResult(string message, List<string>? errors = null)
     {
         return new ApiResponseDto
         {
