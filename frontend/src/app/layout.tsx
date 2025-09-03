@@ -78,6 +78,54 @@ export default function RootLayout({
                   Dashboard
                 </a>
               </li>
+              <li className="mb-2">
+                <a
+                  href="/categories"
+                  className="flex items-center p-2 rounded-md text-gray-700 hover:bg-gray-100"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="lucide lucide-tags mr-2"
+                  >
+                    <path d="M9 5H2v7l6.29-6.29A2 2 0 0 1 9 5Z"></path>
+                    <path d="M6 9.01V9"></path>
+                    <path d="m15 5 6.3 6.3a2.4 2.4 0 0 1 0 3.4L17 19"></path>
+                  </svg>
+                  Categorias
+                </a>
+              </li>
+              <li className="mb-2">
+                <a
+                  href="/products"
+                  className="flex items-center p-2 rounded-md text-gray-700 hover:bg-gray-100"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="lucide lucide-package mr-2"
+                  >
+                    <path d="M16.5 9.4l-9-5.19M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                    <line x1="12" x2="12" y1="22.08" y2="12"></line>
+                  </svg>
+                  Produtos
+                </a>
+              </li>
               <li className="mb-4">
                 <a
                   href="#"
