@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import Image from "next/image";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/sonner";
+import { QueryProvider } from "@/components/providers/QueryProvider";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -382,9 +384,11 @@ export default function RootLayout({
                 <span className="absolute top-1 right-1 block h-2 w-2 rounded-full bg-red-500"></span>
               </button>
               <div className="flex items-center gap-2">
-                <img
+                <Image
                   src="https://api.dicebear.com/7.x/initials/svg?seed=MS"
                   alt="Miguel Santos"
+                  width={40}
+                  height={40}
                   className="w-10 h-10 rounded-full"
                 />
                 <div>
@@ -413,9 +417,11 @@ export default function RootLayout({
             </div>
           </header>
 
-          {/* Page Content */}
+                    {/* Page Content */}
           <div className="p-6 flex-1 overflow-y-auto">
-            {children}
+            <QueryProvider>
+        {children}
+            </QueryProvider>
           </div>
         </main>
         <Toaster />

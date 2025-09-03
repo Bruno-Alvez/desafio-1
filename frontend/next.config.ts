@@ -2,9 +2,17 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: 'standalone',
-  experimental: {
-    serverComponentsExternalPackages: ['mongodb']
-  }
+  serverExternalPackages: ['mongodb'],
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'api.dicebear.com',
+        port: '',
+        pathname: '/7.x/initials/svg**',
+      },
+    ],
+  },
 };
 
 export default nextConfig;

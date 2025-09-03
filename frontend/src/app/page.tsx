@@ -1,9 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import { useDashboard } from "@/hooks/useDashboard";
+import { useLowStockProducts } from "@/hooks/useProducts";
+import { useCategories } from "@/hooks/useCategories";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("Overview");
+
+  // Fetch data from API
+  const { data: dashboardData, isLoading: dashboardLoading, error: dashboardError } = useDashboard();
+  const { data: lowStockProducts, isLoading: lowStockLoading } = useLowStockProducts(10);
+  const { data: categories, isLoading: categoriesLoading } = useCategories();
 
   const tabs = [
     "Overview",
@@ -14,11 +22,32 @@ export default function Home() {
     "Customer Feedback",
   ];
 
+  // Loading state
+  if (dashboardLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (dashboardError) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <p className="text-red-600 mb-2">Failed to load dashboard data</p>
+          <p className="text-gray-500">Please try again later</p>
+        </div>
+      </div>
+    );
+  }
+
   const metrics = [
     {
       title: "Total Products",
-      value: "586",
-      change: "+5 products from last month",
+      value: dashboardData?.totalProducts?.toString() || "0",
+      change: "Active products in inventory",
       changeType: "positive",
       icon: (
         <svg
@@ -40,9 +69,9 @@ export default function Home() {
       ),
     },
     {
-      title: "Average Rating",
-      value: "4.8",
-      change: "+0.2 star from last month",
+      title: "Total Stock Value",
+      value: `$${dashboardData?.totalStockValue?.toLocaleString() || "0"}`,
+      change: "Total inventory value",
       changeType: "positive",
       icon: (
         <svg
@@ -55,16 +84,17 @@ export default function Home() {
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="lucide lucide-star text-purple-600"
+          className="lucide lucide-dollar-sign text-purple-600"
         >
-          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          <line x1="12" x2="12" y1="2" y2="22"></line>
+          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
         </svg>
       ),
     },
     {
-      title: "Sales Trends",
-      value: "",
-      change: "+16.8% from last month",
+      title: "Categories",
+      value: categories?.length?.toString() || "0",
+      change: "Active product categories",
       changeType: "positive",
       icon: (
         <svg
@@ -77,29 +107,19 @@ export default function Home() {
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="lucide lucide-trending-up text-purple-600"
+          className="lucide lucide-tags text-purple-600"
         >
-          <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
-          <polyline points="16 7 22 7 22 13"></polyline>
+          <path d="M9 5H2v7l6.29-6.29A2 2 0 0 1 9 5Z"></path>
+          <path d="M6 9.01V9"></path>
+          <path d="m15 5 6.3 6.3a2.4 2.4 0 0 1 0 3.4L17 19"></path>
         </svg>
-      ),
-      chart: (
-        <div className="w-full h-8 flex items-end justify-center space-x-1">
-          {[3, 5, 2, 6, 4, 7, 3, 5, 6, 4, 8, 5].map((height, index) => (
-            <div
-              key={index}
-              className="bg-purple-600 rounded-sm"
-              style={{ height: `${height * 3}px`, width: "4px" }}
-            ></div>
-          ))}
-        </div>
       ),
     },
     {
       title: "Low Stock",
-      value: "5 products",
-      change: "are under 50 items",
-      changeType: "negative",
+      value: `${dashboardData?.lowStockProductsCount || 0} products`,
+      change: "Need restocking",
+      changeType: dashboardData?.lowStockProductsCount > 0 ? "negative" : "positive",
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -121,50 +141,17 @@ export default function Home() {
     },
   ];
 
-  const activities = [
-    {
-      product: { name: "Linen Shirt", image: "👕" },
-      activityType: "Stock Adjustment",
-      details: "Stock adjusted from 100 to 90 units after bulk order.",
-      date: "June 29, 2024",
-      type: "stock",
+  // Transform low stock products into activities
+  const activities = lowStockProducts?.map((product, index) => ({
+    product: { 
+      name: product.name, 
+      image: "📦" // Default icon for products
     },
-    {
-      product: { name: "Jeans Jacket", image: "🧥" },
-      activityType: "New Product",
-      details: "Price: $65.00, Stock: 70 units",
-      date: "June 28, 2024",
-      type: "new",
-    },
-    {
-      product: { name: "Cotton T-Shirt", image: "👕" },
-      activityType: "Customer Review",
-      details: '"Great quality and fit." Rating: 5 stars',
-      date: "June 28, 2024",
-      type: "review",
-    },
-    {
-      product: { name: "Denim Shorts", image: "🩳" },
-      activityType: "Product Update",
-      details: "Updated description and added new color variants.",
-      date: "June 27, 2024",
-      type: "update",
-    },
-    {
-      product: { name: "Summer Dress", image: "👗" },
-      activityType: "Promotion",
-      details: "Added to summer sale with 20% discount.",
-      date: "June 26, 2024",
-      type: "promotion",
-    },
-    {
-      product: { name: "Old Collection", image: "📦" },
-      activityType: "Deletion",
-      details: "Removed outdated items from inventory.",
-      date: "June 25, 2024",
-      type: "deletion",
-    },
-  ];
+    activityType: "Low Stock Alert",
+    details: `Stock: ${product.stockQuantity} units (minimum: ${product.minimumStock})`,
+    date: new Date().toLocaleDateString(),
+    type: "stock" as const,
+  })) || [];
 
   const getActivityTypeColor = (type: string) => {
     const colors = {
