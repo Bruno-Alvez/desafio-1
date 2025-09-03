@@ -1,5 +1,6 @@
 using Hypesoft.Domain.Entities;
 using Microsoft.Extensions.Configuration;
+using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 
 namespace Hypesoft.Infrastructure.Data;
@@ -10,6 +11,10 @@ public class MongoDbContext
 
     public MongoDbContext(IConfiguration configuration)
     {
+        // Configure MongoDB conventions
+        var conventionPack = new ConventionPack { new CamelCaseElementNameConvention() };
+        ConventionRegistry.Register("camelCase", conventionPack, type => true);
+
         var connectionString = configuration.GetConnectionString("MongoDB") 
             ?? throw new ArgumentNullException(nameof(configuration), "MongoDB connection string is required");
         

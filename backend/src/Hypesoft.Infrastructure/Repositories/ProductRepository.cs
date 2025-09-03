@@ -99,7 +99,17 @@ public class ProductRepository : IProductRepository
         };
 
         var result = await _context.Products.Aggregate<BsonDocument>(pipeline).FirstOrDefaultAsync();
-        return result?["totalValue"]?.AsDecimal ?? 0;
+        if (result != null && result.Contains("totalValue"))
+        {
+            var value = result["totalValue"];
+            if (value.IsDouble)
+                return (decimal)value.AsDouble;
+            if (value.IsInt32)
+                return value.AsInt32;
+            if (value.IsInt64)
+                return value.AsInt64;
+        }
+        return 0;
     }
 
     public async Task<int> GetTotalProductsCountAsync()
