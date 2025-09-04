@@ -5,6 +5,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/sonner";
 import { QueryProvider } from "@/components/providers/QueryProvider";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -57,7 +58,7 @@ export default function RootLayout({
             <ul>
               <li className="mb-2">
                 <a
-                  href="#"
+                  href="/home"
                   className="flex items-center p-2 rounded-md text-gray-700 hover:bg-gray-100"
                 >
                   <svg
@@ -467,9 +468,11 @@ export default function RootLayout({
 
                     {/* Page Content */}
           <div className="p-6 flex-1 overflow-y-auto">
-            <QueryProvider>
-        {children}
-            </QueryProvider>
+                    <AuthProvider>
+          <QueryProvider>
+            {children}
+          </QueryProvider>
+        </AuthProvider>
           </div>
         </main>
         <Toaster />

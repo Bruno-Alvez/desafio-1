@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -89,6 +90,7 @@ export default function CategoriesPage() {
         await updateCategoryMutation.mutateAsync({
           id: selectedCategory.id,
           data: {
+            id: selectedCategory.id,
             ...formData,
             isActive: selectedCategory.isActive
           }
@@ -133,6 +135,7 @@ export default function CategoriesPage() {
       await updateCategoryMutation.mutateAsync({
         id: category.id,
         data: {
+          id: category.id,
           name: category.name,
           description: category.description,
           isActive: !category.isActive
@@ -163,7 +166,8 @@ export default function CategoriesPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <ProtectedRoute>
+      <div className="p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -409,5 +413,6 @@ export default function CategoriesPage() {
         </DialogContent>
       </Dialog>
     </div>
+    </ProtectedRoute>
   );
 }

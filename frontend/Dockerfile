@@ -5,9 +5,10 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Install dependencies based on the preferred package manager
+# Install dependencies using cache mounts for npm
 COPY package.json package-lock.json* ./
-RUN npm ci
+RUN --mount=type=cache,id=npm-cache,target=/root/.npm \
+    npm ci --prefer-offline --no-audit --no-fund
 
 # Rebuild the source code only when needed
 FROM base AS builder
@@ -20,7 +21,8 @@ COPY . .
 # Uncomment the following line in case you want to disable telemetry during the build.
 ENV NEXT_TELEMETRY_DISABLED 1
 
-RUN npm run build
+RUN --mount=type=cache,id=next-cache,target=/app/.next/cache \
+    npm run build
 
 # Production image, copy all the files and run next
 FROM base AS runner

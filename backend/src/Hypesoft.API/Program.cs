@@ -1,5 +1,6 @@
 using Hypesoft.Application;
 using Hypesoft.Infrastructure.Configurations;
+using Hypesoft.API.Extensions;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -39,6 +40,9 @@ builder.Services.AddApplication();
 
 // Add Infrastructure services
 builder.Services.AddInfrastructure(builder.Configuration);
+
+// Add Authentication
+builder.Services.AddKeycloakAuthentication(builder.Configuration);
 
 // Add CORS
 builder.Services.AddCors(options =>

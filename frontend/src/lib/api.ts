@@ -1,5 +1,6 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { ApiResponse } from '@/types/api';
+import { keycloak } from '@/lib/keycloak';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
 
@@ -14,18 +15,42 @@ const apiClient: AxiosInstance = axios.create({
 
 // Request interceptor
 apiClient.interceptors.request.use(
-  (config) => {
-    // Add auth token if available
-    const token = localStorage.getItem('auth_token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+  async (config) => {
+    // Try to attach Keycloak token if available
+    try {
+      if (typeof window !== 'undefined') {
+        // Refresh token if expiring soon
+        if (keycloak.authenticated) {
+          try {
+            await keycloak.updateToken(30);
+          } catch (e) {
+            // If refresh fails, continue without token; response interceptor will handle 401
+          }
+
+          if (keycloak.token) {
+            config.headers = config.headers || {};
+            (config.headers as any).Authorization = `Bearer ${keycloak.token}`;
+          }
+        }
+
+        // Fallback to localStorage token if present
+        if (!(config.headers as any)?.Authorization) {
+          const stored = localStorage.getItem('auth_token');
+          if (stored) {
+            config.headers = config.headers || {};
+            (config.headers as any).Authorization = `Bearer ${stored}`;
+          }
+        }
+      }
+    } catch (err) {
+      // noop
     }
-    
+
     // Log request in development
     if (process.env.NODE_ENV === 'development') {
       console.log(`🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`);
     }
-    
+
     return config;
   },
   (error) => {

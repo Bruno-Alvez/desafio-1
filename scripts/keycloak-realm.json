@@ -41,11 +41,14 @@
       "secret": "hypesoft-frontend-secret",
       "redirectUris": [
         "http://localhost:3000/*",
-        "http://localhost:3000/auth/callback"
+        "http://localhost:3000/login",
+        "http://localhost:3000/silent-check-sso.html"
       ],
-      "webOrigins": ["http://localhost:3000"],
+      "webOrigins": [
+        "http://localhost:3000"
+      ],
       "protocol": "openid-connect",
-      "publicClient": false,
+      "publicClient": true,
       "standardFlowEnabled": true,
       "implicitFlowEnabled": false,
       "directAccessGrantsEnabled": true,

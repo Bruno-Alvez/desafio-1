@@ -1,12 +1,14 @@
 using Hypesoft.Application.DTOs;
 using Hypesoft.Application.Queries.Dashboard;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hypesoft.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class DashboardController : ControllerBase
 {
     private readonly IMediator _mediator;
