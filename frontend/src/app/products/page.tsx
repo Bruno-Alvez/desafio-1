@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -143,6 +144,7 @@ export default function ProductsPage() {
         await updateProductMutation.mutateAsync({
           id: selectedProduct.id,
           data: {
+            id: selectedProduct.id,
             ...formData,
             isActive: selectedProduct.isActive
           }
@@ -291,7 +293,8 @@ export default function ProductsPage() {
   const currentPage = productsData?.pageNumber || 1;
 
   return (
-    <div className="p-6 space-y-6">
+    <ProtectedRoute>
+      <div className="p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -837,5 +840,6 @@ export default function ProductsPage() {
         </DialogContent>
       </Dialog>
     </div>
+    </ProtectedRoute>
   );
 }

@@ -50,7 +50,7 @@ services:
       KC_HOSTNAME_STRICT: false
       KC_HOSTNAME_STRICT_HTTPS: false
       KC_HTTP_ENABLED: true
-    command: start-dev
+    command: start-dev --import-realm
     volumes:
       - ./scripts/keycloak-realm.json:/opt/keycloak/data/import/realm.json:ro
     networks:
@@ -76,10 +76,7 @@ services:
       - keycloak
     networks:
       - hypesoft-network
-    volumes:
-      - ./backend:/app
-      - /app/bin
-      - /app/obj
+    # Use imagem publicada pelo Dockerfile (sem volumes de código para produção)
 
   # Frontend (Next.js 14)
   frontend:
@@ -100,10 +97,7 @@ services:
       - api
     networks:
       - hypesoft-network
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-      - /app/.next
+    # Use imagem publicada pelo Dockerfile (sem volumes de código para produção)
 
   # Nginx (Reverse Proxy)
   nginx:
