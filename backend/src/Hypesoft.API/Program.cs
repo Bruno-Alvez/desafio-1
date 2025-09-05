@@ -74,6 +74,20 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
+
+if (app.Environment.IsProduction())
+{
+    app.UseHsts();
+    app.Use(async (context, next) =>
+    {
+        context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+        context.Response.Headers["X-Frame-Options"] = "SAMEORIGIN";
+        context.Response.Headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+        context.Response.Headers["X-XSS-Protection"] = "0";
+        await next();
+    });
+}
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
