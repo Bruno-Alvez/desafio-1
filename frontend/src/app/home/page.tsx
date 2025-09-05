@@ -8,20 +8,20 @@ import { useCategories } from "@/hooks/useCategories";
 
 export default function Home() {
   const { isAuthenticated, isLoading, user, logout } = useAuth();
-  const [activeTab, setActiveTab] = useState("Overview");
+  const [activeTab, setActiveTab] = useState("Visão geral");
 
   // Fetch data from API
   const { data: dashboardData, isLoading: dashboardLoading } = useDashboard();
   const { data: lowStockData, isLoading: lowStockLoading } = useLowStockProducts();
   const { data: categoriesData, isLoading: categoriesLoading } = useCategories();
 
-  const tabs = ["Overview", "Analytics", "Reports"];
+  const tabs = ["Visão geral"];
 
   const metrics = [
     {
-      title: "Total Products",
-      value: `${dashboardData?.totalProducts || 0} products`,
-      change: "+12% from last month",
+      title: "Total de produtos",
+      value: `${dashboardData?.totalProducts || 0} produtos`,
+      change: "+12% em relação ao mês passado",
       changeType: "positive",
       icon: (
         <svg
@@ -43,9 +43,9 @@ export default function Home() {
       ),
     },
     {
-      title: "Total Stock Value",
-      value: `$${dashboardData?.totalStockValue || 0}`,
-      change: "+8% from last month",
+      title: "Valor total do estoque",
+      value: `R$ ${dashboardData?.totalStockValue || 0}`,
+      change: "+8% em relação ao mês passado",
       changeType: "positive",
       icon: (
         <svg
@@ -66,9 +66,9 @@ export default function Home() {
       ),
     },
     {
-      title: "Low Stock",
-      value: `${dashboardData?.lowStockProductsCount || 0} products`,
-      change: "Need restocking",
+      title: "Estoque baixo",
+      value: `${dashboardData?.lowStockProductsCount || 0} produtos`,
+      change: "Necessita reposição",
       changeType: (dashboardData?.lowStockProductsCount || 0) > 0 ? "negative" : "positive",
       icon: (
         <svg
@@ -116,13 +116,13 @@ export default function Home() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600">Welcome back, {user?.firstName || 'User'}!</p>
+          <p className="text-gray-600">Bem-vindo de volta, {user?.firstName || 'Usuário'}!</p>
         </div>
         <button
           onClick={logout}
           className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
         >
-          Logout
+          Sair
         </button>
       </div>
 
@@ -182,7 +182,7 @@ export default function Home() {
       {/* Recent Activities */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="p-6 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">Recent Activities</h2>
+          <h2 className="text-lg font-semibold text-gray-900">Atividades recentes</h2>
         </div>
         <div className="p-6">
           {dashboardLoading ? (
@@ -197,7 +197,7 @@ export default function Home() {
                     <div className="w-2 h-2 bg-red-500 rounded-full"></div>
                     <div>
                       <p className="font-medium text-gray-900">{product.name}</p>
-                      <p className="text-sm text-gray-500">Low stock: {product.stockQuantity} units</p>
+                      <p className="text-sm text-gray-500">Estoque baixo: {product.stockQuantity} unidades</p>
                     </div>
                   </div>
                   <span className="text-sm text-gray-500">{product.categoryName}</span>
