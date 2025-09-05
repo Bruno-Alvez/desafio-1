@@ -97,7 +97,6 @@ services:
       - api
     networks:
       - hypesoft-network
-    # Use imagem publicada pelo Dockerfile (sem volumes de código para produção)
 
   # Nginx (Reverse Proxy)
   nginx:

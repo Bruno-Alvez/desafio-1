@@ -150,10 +150,12 @@ export default function ProductsPage() {
           }
         });
         setIsEditDialogOpen(false);
+        toast.success("Produto atualizado com sucesso");
       } else {
         // Create new product
         await createProductMutation.mutateAsync(formData);
         setIsCreateDialogOpen(false);
+        toast.success("Produto criado com sucesso");
       }
       
       // Reset form
@@ -172,6 +174,7 @@ export default function ProductsPage() {
       setSelectedProduct(null);
     } catch (error) {
       console.error("Error saving product:", error);
+      toast.error("Não foi possível salvar o produto");
     }
   };
 
@@ -192,8 +195,10 @@ export default function ProductsPage() {
       setIsStockDialogOpen(false);
       setStockData({ productId: "", quantity: 0, reason: "" });
       setSelectedProduct(null);
+      toast.success("Estoque atualizado com sucesso");
     } catch (error) {
       console.error("Error updating stock:", error);
+      toast.error("Não foi possível atualizar o estoque");
     }
   };
 
@@ -230,8 +235,10 @@ export default function ProductsPage() {
   const handleDelete = async (productId: string) => {
     try {
       await deleteProductMutation.mutateAsync(productId);
+      toast.success("Produto excluído com sucesso");
     } catch (error) {
       console.error("Error deleting product:", error);
+      toast.error("Não foi possível excluir o produto");
     }
   };
 
@@ -245,8 +252,10 @@ export default function ProductsPage() {
           isActive: !product.isActive
         }
       });
+      toast.success(product.isActive ? "Produto desativado" : "Produto ativado");
     } catch (error) {
       console.error("Error updating product:", error);
+      toast.error("Não foi possível atualizar o produto");
     }
   };
 
