@@ -108,11 +108,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// CORS deve vir o mais cedo possível, antes de auth
 app.UseCors(app.Environment.IsDevelopment() ? "DevCors" : "ProdCors");
 
+// Redirecionamento HTTPS somente em Produção (evita problemas em Dev quando rodando apenas HTTP)
 if (app.Environment.IsProduction())
 {
+    app.UseHttpsRedirection();
     app.UseHsts();
     app.Use(async (context, next) =>
     {
