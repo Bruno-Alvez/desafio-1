@@ -2,6 +2,8 @@ using Hypesoft.Application;
 using Hypesoft.Infrastructure.Configurations;
 using Hypesoft.API.Extensions;
 using Serilog;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using HealthChecks.MongoDb;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -44,6 +46,12 @@ builder.Services.AddInfrastructure(builder.Configuration);
 // Add Authentication
 builder.Services.AddKeycloakAuthentication(builder.Configuration);
 
+// HealthChecks
+var mongoConnection = builder.Configuration.GetConnectionString("MongoDB");
+builder.Services
+    .AddHealthChecks()
+    .AddMongoDb(mongoConnection, name: "mongodb", timeout: TimeSpan.FromSeconds(3));
+
 // Add CORS
 builder.Services.AddCors(options =>
 {
@@ -70,8 +78,9 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-// Health check endpoint
-app.MapGet("/health", () => Results.Ok(new { Status = "Healthy", Timestamp = DateTime.UtcNow }));
+// Health check endpoints
+app.MapHealthChecks("/health/live");
+app.MapHealthChecks("/health/ready");
 
 try
 {
