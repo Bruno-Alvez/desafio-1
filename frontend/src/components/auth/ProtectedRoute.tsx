@@ -18,10 +18,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   useEffect(() => {
     if (!isLoading) {
-      console.log('ProtectedRoute - isLoading:', isLoading, 'isAuthenticated:', isAuthenticated);
-      
       if (!isAuthenticated) {
-        console.log('Not authenticated, redirecting to login');
         // Use replace instead of push to avoid back button issues
         router.replace('/login');
         return;
@@ -30,13 +27,10 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
       if (requiredRoles.length > 0) {
         const hasRequiredRole = requiredRoles.some(role => hasRole(role));
         if (!hasRequiredRole) {
-          console.log('No required role, redirecting to unauthorized');
           router.replace('/unauthorized');
           return;
         }
       }
-      
-      console.log('Access granted');
     }
   }, [isAuthenticated, isLoading, requiredRoles, hasRole, router]);
 

@@ -56,14 +56,15 @@ export const useCreateProduct = () => {
       if (response.success) {
         queryClient.invalidateQueries({ queryKey: productKeys.lists() });
         queryClient.invalidateQueries({ queryKey: productKeys.lowStock(10) });
-        toast.success('Product created successfully!');
+        toast.success('Produto criado com sucesso');
       } else {
-        toast.error(response.message || 'Failed to create product');
+        toast.error(response.message || 'Falha ao criar produto');
       }
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       console.error('Create product error:', error);
-      toast.error('Failed to create product');
+      const apiMessage = (error as any)?.response?.data?.message;
+      toast.error(apiMessage || 'Falha ao criar produto');
     },
   });
 };
@@ -80,14 +81,15 @@ export const useUpdateProduct = () => {
         queryClient.invalidateQueries({ queryKey: productKeys.lists() });
         queryClient.invalidateQueries({ queryKey: productKeys.detail(id) });
         queryClient.invalidateQueries({ queryKey: productKeys.lowStock(10) });
-        toast.success('Product updated successfully!');
+        toast.success('Produto atualizado com sucesso');
       } else {
-        toast.error(response.message || 'Failed to update product');
+        toast.error(response.message || 'Falha ao atualizar produto');
       }
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       console.error('Update product error:', error);
-      toast.error('Failed to update product');
+      const apiMessage = (error as any)?.response?.data?.message;
+      toast.error(apiMessage || 'Falha ao atualizar produto');
     },
   });
 };
@@ -102,14 +104,15 @@ export const useDeleteProduct = () => {
       if (response.success) {
         queryClient.invalidateQueries({ queryKey: productKeys.lists() });
         queryClient.invalidateQueries({ queryKey: productKeys.lowStock(10) });
-        toast.success('Product deleted successfully!');
+        toast.success('Produto excluído com sucesso');
       } else {
-        toast.error(response.message || 'Failed to delete product');
+        toast.error(response.message || 'Falha ao excluir produto');
       }
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       console.error('Delete product error:', error);
-      toast.error('Failed to delete product');
+      const apiMessage = (error as any)?.response?.data?.message;
+      toast.error(apiMessage || 'Falha ao excluir produto');
     },
   });
 };
@@ -126,14 +129,15 @@ export const useUpdateStock = () => {
         queryClient.invalidateQueries({ queryKey: productKeys.lists() });
         queryClient.invalidateQueries({ queryKey: productKeys.detail(id) });
         queryClient.invalidateQueries({ queryKey: productKeys.lowStock(10) });
-        toast.success('Stock updated successfully!');
+        toast.success('Estoque atualizado com sucesso');
       } else {
-        toast.error(response.message || 'Failed to update stock');
+        toast.error(response.message || 'Falha ao atualizar estoque');
       }
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       console.error('Update stock error:', error);
-      toast.error('Failed to update stock');
+      const apiMessage = (error as any)?.response?.data?.message;
+      toast.error(apiMessage || 'Falha ao atualizar estoque');
     },
   });
 };

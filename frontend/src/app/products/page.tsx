@@ -66,7 +66,7 @@ import {
   useUpdateStock 
 } from "@/hooks/useProducts";
 import { useCategories } from "@/hooks/useCategories";
-import { CreateProductDto, UpdateProductDto, UpdateStockDto, PaginationDto } from "@/types/api";
+import { CreateProductDto, UpdateProductDto, UpdateStockDto, PaginationDto, Product } from "@/types/api";
 import { toast } from "sonner";
 
 export default function ProductsPage() {
@@ -78,7 +78,7 @@ export default function ProductsPage() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isStockDialogOpen, setIsStockDialogOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [formData, setFormData] = useState<CreateProductDto>({
     name: "",
     description: "",
@@ -138,6 +138,21 @@ export default function ProductsPage() {
       return;
     }
 
+    if (formData.price <= 0) {
+      toast.error("Preço deve ser maior que 0");
+      return;
+    }
+
+    if (!/^[A-Z0-9\-_]+$/.test(formData.sku)) {
+      toast.error("SKU deve conter apenas letras maiúsculas, números, hífen e underscore");
+      return;
+    }
+
+    if (formData.barcode && !/^\d+$/.test(formData.barcode)) {
+      toast.error("Código de barras deve conter apenas números");
+      return;
+    }
+
     try {
       if (selectedProduct) {
         // Update existing product
@@ -182,6 +197,11 @@ export default function ProductsPage() {
   const handleStockUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!selectedProduct) {
+      toast.error("Selecione um produto para atualizar o estoque");
+      return;
+    }
+
     if (!stockData.reason.trim()) {
       toast.error("Motivo da alteração é obrigatório");
       return;
@@ -203,7 +223,7 @@ export default function ProductsPage() {
   };
 
   // Handle edit
-  const handleEdit = (product: any) => {
+  const handleEdit = (product: Product) => {
     setSelectedProduct(product);
     setFormData({
       name: product.name,
@@ -221,7 +241,7 @@ export default function ProductsPage() {
   };
 
   // Handle stock update dialog
-  const handleStockDialog = (product: any) => {
+  const handleStockDialog = (product: Product) => {
     setSelectedProduct(product);
     setStockData({
       productId: product.id,
@@ -243,7 +263,7 @@ export default function ProductsPage() {
   };
 
   // Handle toggle active status
-  const handleToggleActive = async (product: any) => {
+  const handleToggleActive = async (product: Product) => {
     try {
       await updateProductMutation.mutateAsync({
         id: product.id,
@@ -342,7 +362,7 @@ export default function ProductsPage() {
                     <Input
                       id="sku"
                       value={formData.sku}
-                      onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
+                      onChange={(e) => setFormData({ ...formData, sku: e.target.value.toUpperCase() })}
                       placeholder="Ex: SMARTPHONE-001"
                       required
                     />

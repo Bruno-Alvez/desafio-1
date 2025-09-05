@@ -49,7 +49,7 @@ import {
   Package
 } from "lucide-react";
 import { useCategories, useCreateCategory, useUpdateCategory, useDeleteCategory } from "@/hooks/useCategories";
-import { CreateCategoryDto, UpdateCategoryDto } from "@/types/api";
+import { CreateCategoryDto, UpdateCategoryDto, Category } from "@/types/api";
 import { toast } from "sonner";
 
 export default function CategoriesPage() {
@@ -57,7 +57,7 @@ export default function CategoriesPage() {
   const [showInactive, setShowInactive] = useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<any>(null);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [formData, setFormData] = useState<CreateCategoryDto>({
     name: "",
     description: ""
@@ -81,6 +81,26 @@ export default function CategoriesPage() {
     
     if (!formData.name.trim()) {
       toast.error("Nome da categoria é obrigatório");
+      return;
+    }
+
+    const name = formData.name.trim();
+    const namePattern = /^[a-zA-Z0-9\s\-_&]+$/;
+    if (!namePattern.test(name)) {
+      toast.error("Nome inválido. Use apenas letras, números, espaço, - _ & (sem acentos)");
+      return;
+    }
+
+    const exists = (categories || []).some(c => 
+      c.name.toLowerCase() === name.toLowerCase() && (!selectedCategory || c.id !== selectedCategory.id)
+    );
+    if (exists) {
+      toast.error("Categoria já existe");
+      return;
+    }
+
+    if (formData.description && formData.description.length > 500) {
+      toast.error("Descrição não pode exceder 500 caracteres");
       return;
     }
 
@@ -114,7 +134,7 @@ export default function CategoriesPage() {
   };
 
   // Handle edit
-  const handleEdit = (category: any) => {
+  const handleEdit = (category: Category) => {
     setSelectedCategory(category);
     setFormData({
       name: category.name,
@@ -135,7 +155,7 @@ export default function CategoriesPage() {
   };
 
   // Handle toggle active status
-  const handleToggleActive = async (category: any) => {
+  const handleToggleActive = async (category: Category) => {
     try {
       await updateCategoryMutation.mutateAsync({
         id: category.id,
