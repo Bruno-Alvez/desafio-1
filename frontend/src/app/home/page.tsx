@@ -94,7 +94,7 @@ export default function Home() {
 
   const chartLowStock = (categoriesData || []).map((c: any) => ({
     name: c.name,
-    value: (lowStockData || []).filter(p => p.categoryId === c.id).length,
+    value: (lowStockData || []).filter((p: any) => p.categoryName === c.name).length,
   }));
 
   const chartTotal = (categoriesData || []).map((c: any) => ({

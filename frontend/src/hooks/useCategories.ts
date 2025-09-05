@@ -40,14 +40,15 @@ export const useCreateCategory = () => {
     onSuccess: (response) => {
       if (response.success) {
         queryClient.invalidateQueries({ queryKey: categoryKeys.lists() });
-        toast.success('Category created successfully!');
+        toast.success('Categoria criada com sucesso');
       } else {
-        toast.error(response.message || 'Failed to create category');
+        toast.error(response.message || 'Falha ao criar categoria');
       }
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       console.error('Create category error:', error);
-      toast.error('Failed to create category');
+      const apiMessage = (error as any)?.response?.data?.message;
+      toast.error(apiMessage || 'Falha ao criar categoria');
     },
   });
 };
@@ -63,14 +64,15 @@ export const useUpdateCategory = () => {
       if (response.success) {
         queryClient.invalidateQueries({ queryKey: categoryKeys.lists() });
         queryClient.invalidateQueries({ queryKey: categoryKeys.detail(id) });
-        toast.success('Category updated successfully!');
+        toast.success('Categoria atualizada com sucesso');
       } else {
-        toast.error(response.message || 'Failed to update category');
+        toast.error(response.message || 'Falha ao atualizar categoria');
       }
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       console.error('Update category error:', error);
-      toast.error('Failed to update category');
+      const apiMessage = (error as any)?.response?.data?.message;
+      toast.error(apiMessage || 'Falha ao atualizar categoria');
     },
   });
 };
@@ -84,14 +86,15 @@ export const useDeleteCategory = () => {
     onSuccess: (response) => {
       if (response.success) {
         queryClient.invalidateQueries({ queryKey: categoryKeys.lists() });
-        toast.success('Category deleted successfully!');
+        toast.success('Categoria excluída com sucesso');
       } else {
-        toast.error(response.message || 'Failed to delete category');
+        toast.error(response.message || 'Falha ao excluir categoria');
       }
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       console.error('Delete category error:', error);
-      toast.error('Failed to delete category');
+      const apiMessage = (error as any)?.response?.data?.message;
+      toast.error(apiMessage || 'Falha ao excluir categoria');
     },
   });
 };

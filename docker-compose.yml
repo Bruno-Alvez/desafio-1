@@ -1,51 +1,63 @@
-version: '3.8'
-
 services:
   # MongoDB Database
   mongodb:
     image: mongo:7.0
     container_name: hypesoft-mongodb
     restart: unless-stopped
+    profiles: ["dev", "prod"]
     ports:
-      - "27017:27017"
+      - "${MONGODB_PORT:-27017}:27017"
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: password123
-      MONGO_INITDB_DATABASE: hypesoft
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE:-hypesoft}
     volumes:
       - mongodb_data:/data/db
       - ./scripts/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
     networks:
       - hypesoft-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
 
   # MongoDB Express (Admin UI)
   mongo-express:
     image: mongo-express:1.0.0
     container_name: hypesoft-mongo-express
     restart: unless-stopped
+    profiles: ["dev", "prod"]
     ports:
-      - "8081:8081"
+      - "${MONGO_EXPRESS_PORT:-8081}:8081"
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
-      ME_CONFIG_MONGODB_ADMINPASSWORD: password123
-      ME_CONFIG_MONGODB_URL: mongodb://admin:password123@mongodb:27017/
-      ME_CONFIG_BASICAUTH_USERNAME: admin
-      ME_CONFIG_BASICAUTH_PASSWORD: admin123
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_INITDB_ROOT_USERNAME:-admin}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-password123}
+      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_INITDB_ROOT_USERNAME:-admin}:${MONGO_INITDB_ROOT_PASSWORD:-password123}@mongodb:27017/
+      ME_CONFIG_BASICAUTH_USERNAME: ${ME_BASIC_AUTH_USERNAME:-admin}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${ME_BASIC_AUTH_PASSWORD:-admin123}
     depends_on:
-      - mongodb
+      mongodb:
+        condition: service_healthy
     networks:
       - hypesoft-network
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8081"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
 
   # Keycloak (Authentication)
   keycloak:
     image: quay.io/keycloak/keycloak:23.0
     container_name: hypesoft-keycloak
     restart: unless-stopped
+    profiles: ["dev", "prod"]
     ports:
-      - "8080:8080"
+      - "${KEYCLOAK_PORT:-8080}:8080"
     environment:
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin123
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin123}
       KC_DB: dev-file
       KC_HOSTNAME_STRICT: false
       KC_HOSTNAME_STRICT_HTTPS: false
@@ -55,6 +67,11 @@ services:
       - ./scripts/keycloak-realm.json:/opt/keycloak/data/import/realm.json:ro
     networks:
       - hypesoft-network
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/health/ready"]
+      interval: 15s
+      timeout: 5s
+      retries: 20
 
   # Backend API (.NET 9)
   api:
@@ -63,20 +80,28 @@ services:
       dockerfile: Dockerfile
     container_name: hypesoft-api
     restart: unless-stopped
+    profiles: ["dev", "prod"]
     ports:
-      - "5000:8080"
+      - "${API_PORT:-5000}:8080"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
       - ASPNETCORE_URLS=http://+:8080
-      - ConnectionStrings__MongoDB=mongodb://admin:password123@mongodb:27017/hypesoft?authSource=admin
-      - Keycloak__Authority=http://keycloak:8080/realms/hypesoft
-      - Keycloak__Audience=hypesoft-api
+      - ConnectionStrings__MongoDB=mongodb://${MONGO_INITDB_ROOT_USERNAME:-admin}:${MONGO_INITDB_ROOT_PASSWORD:-password123}@mongodb:27017/${MONGO_INITDB_DATABASE:-hypesoft}?authSource=admin
+      - Keycloak__Authority=http://keycloak:8080/realms/${KEYCLOAK_REALM:-hypesoft}
+      - Keycloak__Audience=${KEYCLOAK_AUDIENCE:-hypesoft-api}
     depends_on:
-      - mongodb
-      - keycloak
+      mongodb:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
     networks:
       - hypesoft-network
     # Use imagem publicada pelo Dockerfile (sem volumes de código para produção)
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/health/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
 
   # Frontend (Next.js 14)
   frontend:
@@ -85,31 +110,41 @@ services:
       dockerfile: Dockerfile
     container_name: hypesoft-frontend
     restart: unless-stopped
+    profiles: ["dev", "prod"]
     ports:
-      - "3000:3000"
+      - "${FRONTEND_PORT:-3000}:3000"
     environment:
-      - NODE_ENV=development
-      - NEXT_PUBLIC_API_URL=http://localhost:5000
-      - NEXT_PUBLIC_KEYCLOAK_URL=http://localhost:8080
-      - NEXT_PUBLIC_KEYCLOAK_REALM=hypesoft
-      - NEXT_PUBLIC_KEYCLOAK_CLIENT_ID=hypesoft-frontend
+      - NODE_ENV=${NODE_ENV:-production}
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://api:8080}
+      - NEXT_PUBLIC_KEYCLOAK_URL=${NEXT_PUBLIC_KEYCLOAK_URL:-http://keycloak:8080}
+      - NEXT_PUBLIC_KEYCLOAK_REALM=${NEXT_PUBLIC_KEYCLOAK_REALM:-hypesoft}
+      - NEXT_PUBLIC_KEYCLOAK_CLIENT_ID=${NEXT_PUBLIC_KEYCLOAK_CLIENT_ID:-hypesoft-frontend}
     depends_on:
-      - api
+      api:
+        condition: service_healthy
     networks:
       - hypesoft-network
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
 
   # Nginx (Reverse Proxy)
   nginx:
     image: nginx:alpine
     container_name: hypesoft-nginx
     restart: unless-stopped
+    profiles: ["prod"]
     ports:
-      - "80:80"
+      - "${NGINX_PORT:-80}:80"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
-      - frontend
-      - api
+      frontend:
+        condition: service_healthy
+      api:
+        condition: service_healthy
     networks:
       - hypesoft-network
 

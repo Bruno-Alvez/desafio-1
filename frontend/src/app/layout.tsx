@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import Image from "next/image";
+import Link from "next/link";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/sonner";
@@ -20,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="pt-BR">
       <body
         className={cn(
           "min-h-screen bg-background font-sans antialiased flex",
@@ -55,7 +55,7 @@ export default function RootLayout({
           <nav className="flex-grow">
             <ul className="space-y-1">
               <li>
-                <a href="/home" className="flex items-center p-2 rounded-md text-gray-700 hover:bg-gray-100">
+                <Link href="/home" className="flex items-center p-2 rounded-md text-gray-700 hover:bg-gray-100">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="18"
@@ -72,10 +72,10 @@ export default function RootLayout({
                     <polyline points="9 22 9 12 15 12 15 22"></polyline>
                   </svg>
                   Dashboard
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/products" className="flex items-center p-2 rounded-md text-gray-700 hover:bg-gray-100">
+                <Link href="/products" className="flex items-center p-2 rounded-md text-gray-700 hover:bg-gray-100">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="18"
@@ -93,10 +93,10 @@ export default function RootLayout({
                     <line x1="12" x2="12" y1="22.08" y2="12"></line>
                   </svg>
                   Gestão de Produtos
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/categories" className="flex items-center p-2 rounded-md text-gray-700 hover:bg-gray-100">
+                <Link href="/categories" className="flex items-center p-2 rounded-md text-gray-700 hover:bg-gray-100">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="18"
@@ -114,7 +114,7 @@ export default function RootLayout({
                     <path d="m15 5 6.3 6.3a2.4 2.4 0 0 1 0 3.4L17 19"></path>
                   </svg>
                   Sistema de Categorias
-                </a>
+                </Link>
               </li>
             </ul>
           </nav>
