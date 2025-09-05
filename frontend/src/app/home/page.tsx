@@ -3,7 +3,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
 import { useDashboard } from "@/hooks/useDashboard";
-import { useLowStockProducts } from "@/hooks/useProducts";
+import { useLowStockProducts, useProducts } from "@/hooks/useProducts";
 import { useCategories } from "@/hooks/useCategories";
 
 export default function Home() {
@@ -13,6 +13,7 @@ export default function Home() {
   // Fetch data from API
   const { data: dashboardData, isLoading: dashboardLoading } = useDashboard();
   const { data: lowStockData, isLoading: lowStockLoading } = useLowStockProducts();
+  const { data: allProductsData } = useProducts({ pageNumber: 1, pageSize: 500, searchTerm: "", sortBy: "name", sortDescending: false });
   const { data: categoriesData, isLoading: categoriesLoading } = useCategories();
 
   const tabs = ["Visão geral"];
@@ -90,6 +91,16 @@ export default function Home() {
       ),
     },
   ];
+
+  const chartLowStock = (categoriesData || []).map((c: any) => ({
+    name: c.name,
+    value: (lowStockData || []).filter(p => p.categoryId === c.id).length,
+  }));
+
+  const chartTotal = (categoriesData || []).map((c: any) => ({
+    name: c.name,
+    value: (allProductsData?.items || []).filter((p: any) => p.categoryId === c.id).length,
+  }));
 
   if (isLoading) {
     return (
@@ -177,6 +188,55 @@ export default function Home() {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Charts */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Produtos por categoria (total)</h2>
+          <div className="w-full overflow-x-auto">
+            <div className="flex items-end gap-4 h-40">
+              {chartTotal.map((item) => (
+                <div key={item.name} className="flex flex-col items-center min-w-[60px]">
+                  <div
+                    className="w-8 bg-purple-500 rounded"
+                    style={{ height: `${Math.min(100, (item.value || 0) * 20)}%` }}
+                    title={`${item.name}: ${item.value}`}
+                  />
+                  <span className="mt-2 text-xs text-gray-600 truncate max-w-[80px]" title={item.name}>
+                    {item.name}
+                  </span>
+                </div>
+              ))}
+              {chartTotal.length === 0 && (
+                <div className="text-sm text-gray-500">Sem dados para exibir</div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Produtos com estoque baixo por categoria</h2>
+          <div className="w-full overflow-x-auto">
+            <div className="flex items-end gap-4 h-40">
+              {chartLowStock.map((item) => (
+                <div key={item.name} className="flex flex-col items-center min-w-[60px]">
+                  <div
+                    className="w-8 bg-red-500 rounded"
+                    style={{ height: `${Math.min(100, (item.value || 0) * 20)}%` }}
+                    title={`${item.name}: ${item.value}`}
+                  />
+                  <span className="mt-2 text-xs text-gray-600 truncate max-w-[80px]" title={item.name}>
+                    {item.name}
+                  </span>
+                </div>
+              ))}
+              {chartLowStock.length === 0 && (
+                <div className="text-sm text-gray-500">Sem dados para exibir</div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Recent Activities */}
