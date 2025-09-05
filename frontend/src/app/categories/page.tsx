@@ -96,10 +96,12 @@ export default function CategoriesPage() {
           }
         });
         setIsEditDialogOpen(false);
+        toast.success("Categoria atualizada com sucesso");
       } else {
         // Create new category
         await createCategoryMutation.mutateAsync(formData);
         setIsCreateDialogOpen(false);
+        toast.success("Categoria criada com sucesso");
       }
       
       // Reset form
@@ -107,6 +109,7 @@ export default function CategoriesPage() {
       setSelectedCategory(null);
     } catch (error) {
       console.error("Error saving category:", error);
+      toast.error("Não foi possível salvar a categoria");
     }
   };
 
@@ -124,8 +127,10 @@ export default function CategoriesPage() {
   const handleDelete = async (categoryId: string) => {
     try {
       await deleteCategoryMutation.mutateAsync(categoryId);
+      toast.success("Categoria excluída com sucesso");
     } catch (error) {
       console.error("Error deleting category:", error);
+      toast.error("Não foi possível excluir a categoria");
     }
   };
 
@@ -141,8 +146,10 @@ export default function CategoriesPage() {
           isActive: !category.isActive
         }
       });
+      toast.success(category.isActive ? "Categoria desativada" : "Categoria ativada");
     } catch (error) {
       console.error("Error updating category:", error);
+      toast.error("Não foi possível atualizar a categoria");
     }
   };
 

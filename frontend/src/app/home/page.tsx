@@ -114,8 +114,8 @@ export default function Home() {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Not Authenticated</h1>
-          <p>Please log in to access this page.</p>
+          <h1 className="text-2xl font-bold mb-4">Não autenticado</h1>
+          <p>Faça login para acessar esta página.</p>
         </div>
       </div>
     );
