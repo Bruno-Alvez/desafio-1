@@ -9,6 +9,8 @@ public class GetDashboardDataQueryHandler : IRequestHandler<GetDashboardDataQuer
 {
     private readonly IProductRepository _productRepository;
     private readonly ICategoryRepository _categoryRepository;
+    private static DashboardDto? _cachedData;
+    private static DateTime _cacheExpiresAt = DateTime.MinValue;
 
     public GetDashboardDataQueryHandler(IProductRepository productRepository, ICategoryRepository categoryRepository)
     {
@@ -18,6 +20,11 @@ public class GetDashboardDataQueryHandler : IRequestHandler<GetDashboardDataQuer
 
     public async Task<ApiResponseDto<DashboardDto>> Handle(GetDashboardDataQuery request, CancellationToken cancellationToken)
     {
+        if (DateTime.UtcNow < _cacheExpiresAt && _cachedData is not null)
+        {
+            return ApiResponseDto<DashboardDto>.SuccessResult(_cachedData);
+        }
+
         try
         {
             var totalProducts = await _productRepository.GetTotalProductsCountAsync();
@@ -65,7 +72,9 @@ public class GetDashboardDataQueryHandler : IRequestHandler<GetDashboardDataQuer
                 CategoryStats = categoryStats
             };
 
-            return ApiResponseDto<DashboardDto>.SuccessResult(dashboardData);
+            _cachedData = dashboardData;
+            _cacheExpiresAt = DateTime.UtcNow.AddSeconds(60);
+            return ApiResponseDto<DashboardDto>.SuccessResult(_cachedData);
         }
         catch (Exception ex)
         {
